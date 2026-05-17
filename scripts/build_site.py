@@ -153,6 +153,15 @@ def ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
+def remove_output_dir(output_dir: Path) -> None:
+    if not output_dir.exists():
+        return
+    try:
+        shutil.rmtree(output_dir)
+    except FileNotFoundError:
+        shutil.rmtree(output_dir)
+
+
 def format_date(value: date | None) -> str:
     if value is None:
         return ""
@@ -339,8 +348,7 @@ def main(argv: list[str]) -> int:
     if not output_dir.is_absolute():
         output_dir = ROOT / output_dir
 
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
+    remove_output_dir(output_dir)
 
     build_site(output_dir)
     print(f"Built site into {output_dir}")
