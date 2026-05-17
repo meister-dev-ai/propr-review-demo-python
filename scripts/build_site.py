@@ -27,6 +27,7 @@ class ContentFile:
     order: int | None = None
     slug: str | None = None
     summary: str | None = None
+    summary_html: str | None = None
     published_on: date | None = None
 
 
@@ -120,6 +121,7 @@ def load_markdown(path: Path, route: str, slug: str | None = None) -> ContentFil
     description = str(frontmatter.get("description", ""))
     order_value = frontmatter.get("order")
     published_on = frontmatter.get("date")
+    summary = str(frontmatter.get("summary")) if frontmatter.get("summary") is not None else None
     return ContentFile(
         title=title,
         description=description,
@@ -128,7 +130,8 @@ def load_markdown(path: Path, route: str, slug: str | None = None) -> ContentFil
         route=route,
         order=order_value if isinstance(order_value, int) else None,
         slug=slug,
-        summary=str(frontmatter.get("summary")) if frontmatter.get("summary") is not None else None,
+        summary=summary,
+        summary_html=f"<p>{summary}</p>" if summary else None,
         published_on=published_on if isinstance(published_on, date) else None,
     )
 
@@ -217,7 +220,7 @@ def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
         <article class="article-card">
           <div class="article-card-meta"><span>{html.escape(format_date(article.published_on))}</span></div>
           <h2><a href="{article.route}">{html.escape(article.title)}</a></h2>
-          <p>{html.escape(article.summary or article.description)}</p>
+          {article.summary_html or f'<p>{html.escape(article.description)}</p>'}
         </article>
         """
         for article in articles
