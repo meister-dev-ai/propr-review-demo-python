@@ -1,0 +1,13 @@
+{
+  "name": "propr-review-demo-python",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "python3 scripts/build_site.py dist",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "typescript": "^5.9.3"
+  }
+}
