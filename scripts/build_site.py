@@ -212,6 +212,7 @@ def render_page_panel(title: str, description: str, body_html: str) -> str:
 
 
 def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
+    latest_articles = sorted(articles, key=lambda article: article.published_on or date.min)[:3]
     cards = "".join(
         f"""
         <article class="article-card">
@@ -222,6 +223,10 @@ def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
         """
         for article in articles
     )
+    latest_posts = "".join(
+        f'<li><a href="{article.route}">{html.escape(article.title)}</a> <span>{html.escape(format_date(article.published_on))}</span></li>'
+        for article in latest_articles
+    )
     return f"""
 <section class="panel stack-gap">
   <header class="panel-header">
@@ -229,6 +234,13 @@ def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
     <p>{html.escape(section.description)}</p>
   </header>
   <div class="markdown stack-gap">{section.body_html}</div>
+  <aside class="panel stack-gap">
+    <div>
+      <h2>Latest posts</h2>
+      <p>Catch up on the most recent writing from the blog.</p>
+    </div>
+    <ul class="latest-posts-list">{latest_posts}</ul>
+  </aside>
   <div class="article-list">{cards}</div>
 </section>
 """

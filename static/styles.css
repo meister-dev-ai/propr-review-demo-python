@@ -145,6 +145,25 @@ main {
   gap: 1rem;
 }
 
+.latest-posts-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #526273;
+}
+
+.latest-posts-list li + li {
+  margin-top: 0.65rem;
+}
+
+.latest-posts-list a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.latest-posts-list span {
+  color: #607385;
+}
+
 .article-card {
   padding: 1.1rem;
   border-radius: 18px;
