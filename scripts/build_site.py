@@ -143,6 +143,10 @@ def article_sort_key(item: ContentFile) -> tuple[int, int, str]:
     return (date_key, order_key, item.title.casefold())
 
 
+def build_metadata_cache(items: Iterable[ContentFile]) -> dict[str, ContentFile]:
+    return {item.title.casefold(): item for item in items}
+
+
 def route_to_output_path(output_dir: Path, route: str) -> Path:
     if route == "/":
         return output_dir / "index.html"
@@ -277,6 +281,7 @@ def build_site(output_dir: Path) -> None:
 
     sorted_sections = sorted((section for section, _ in sections), key=page_sort_key)
     nav_items = sorted([*pages, *sorted_sections], key=page_sort_key)
+    metadata_cache = build_metadata_cache(nav_items)
     site_home = next(page for page in pages if page.route == "/")
 
     for page in pages:
@@ -285,7 +290,7 @@ def build_site(output_dir: Path) -> None:
         output_path.write_text(
             render_layout(
                 site_title=site_home.title,
-                site_tagline=site_home.description,
+                site_tagline=metadata_cache[site_home.title.casefold()].description,
                 nav_items=nav_items,
                 current_route=page.route,
                 page_title=page.title,
