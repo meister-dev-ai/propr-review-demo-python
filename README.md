@@ -16,3 +16,7 @@ npx playwright install chromium
 python3 scripts/build_site.py dist
 npm run test:e2e
 ```
+
+## Review branches
+
+- `BUG_SCENARIOS.md` lists the intentionally defective feature branches that should be reviewed against `main`.
