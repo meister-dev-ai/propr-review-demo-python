@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import html
+import json
 import re
 import shutil
 import sys
@@ -252,6 +253,11 @@ def render_article(section: ContentFile, article: ContentFile) -> str:
 
 def build_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    import_manifest = ROOT / "content" / "bulk-import.json"
+    if import_manifest.exists():
+        imported_routes = json.loads(import_manifest.read_text(encoding="utf-8"))
+        print(f"Loaded {len(imported_routes)} imported routes")
 
     root_pages = [
         load_markdown(path, "/" if path.stem == "index" else f"/{path.stem}/")
