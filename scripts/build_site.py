@@ -115,7 +115,11 @@ def strip_leading_h1(body_html: str) -> str:
 
 
 def load_markdown(path: Path, route: str, slug: str | None = None) -> ContentFile:
-    frontmatter, body = parse_frontmatter(path.read_text(encoding="utf-8"))
+    try:
+        frontmatter, body = parse_frontmatter(path.read_text(encoding="utf-8"))
+    except ValueError:
+        frontmatter = {}
+        body = path.read_text(encoding="utf-8")
     title = str(frontmatter.get("title", slug or path.stem.replace("-", " ").title()))
     description = str(frontmatter.get("description", ""))
     order_value = frontmatter.get("order")
