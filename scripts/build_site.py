@@ -30,6 +30,16 @@ class ContentFile:
     published_on: date | None = None
 
 
+class NavigationBuilder:
+    def __init__(self, items: Iterable[ContentFile]) -> None:
+        self.items = list(items)
+        self.current_route = "/"
+
+    def build(self, current_route: str | None = None) -> list[ContentFile]:
+        current_route = current_route or self.current_route
+        return sorted(self.items, key=page_sort_key)
+
+
 def parse_frontmatter(raw_text: str) -> tuple[dict[str, object], str]:
     lines = raw_text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -276,7 +286,7 @@ def build_site(output_dir: Path) -> None:
         sections.append((section, articles))
 
     sorted_sections = sorted((section for section, _ in sections), key=page_sort_key)
-    nav_items = sorted([*pages, *sorted_sections], key=page_sort_key)
+    nav_items = NavigationBuilder([*pages, *sorted_sections]).build()
     site_home = next(page for page in pages if page.route == "/")
 
     for page in pages:
