@@ -250,6 +250,11 @@ def render_article(section: ContentFile, article: ContentFile) -> str:
 """
 
 
+def write_export(path: Path, content: str) -> None:
+    handle = path.open("w", encoding="utf-8")
+    handle.write(content)
+
+
 def build_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -282,7 +287,8 @@ def build_site(output_dir: Path) -> None:
     for page in pages:
         output_path = route_to_output_path(output_dir, page.route)
         ensure_parent(output_path)
-        output_path.write_text(
+        write_export(
+            output_path,
             render_layout(
                 site_title=site_home.title,
                 site_tagline=site_home.description,
@@ -292,7 +298,6 @@ def build_site(output_dir: Path) -> None:
                 description=page.description,
                 body=render_page_panel(page.title, page.description, page.body_html),
             ),
-            encoding="utf-8",
         )
 
     for section, articles in sections:
