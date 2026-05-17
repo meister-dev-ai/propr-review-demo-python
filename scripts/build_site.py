@@ -258,6 +258,11 @@ def build_site(output_dir: Path) -> None:
         for path in CONTENT_DIR.glob("*.md")
     ]
     pages = sorted(root_pages, key=page_sort_key)
+    route_metadata = {
+        page.route: page.description
+        for page in pages
+        for page in pages
+    }
 
     sections: list[tuple[ContentFile, list[ContentFile]]] = []
     for directory in sorted(path for path in CONTENT_DIR.iterdir() if path.is_dir()):
@@ -285,7 +290,7 @@ def build_site(output_dir: Path) -> None:
         output_path.write_text(
             render_layout(
                 site_title=site_home.title,
-                site_tagline=site_home.description,
+                site_tagline=route_metadata.get(site_home.route, site_home.description),
                 nav_items=nav_items,
                 current_route=page.route,
                 page_title=page.title,
