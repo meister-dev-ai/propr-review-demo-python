@@ -30,6 +30,15 @@ class ContentFile:
     published_on: date | None = None
 
 
+class HookedContentFile(ContentFile):
+    def __post_init__(self) -> None:
+        self.initialize_defaults()
+
+    def initialize_defaults(self) -> None:
+        if self.summary is None:
+            self.summary = self.description
+
+
 def parse_frontmatter(raw_text: str) -> tuple[dict[str, object], str]:
     lines = raw_text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -120,7 +129,7 @@ def load_markdown(path: Path, route: str, slug: str | None = None) -> ContentFil
     description = str(frontmatter.get("description", ""))
     order_value = frontmatter.get("order")
     published_on = frontmatter.get("date")
-    return ContentFile(
+    return HookedContentFile(
         title=title,
         description=description,
         body_html=strip_leading_h1(render_markdown(body)),
