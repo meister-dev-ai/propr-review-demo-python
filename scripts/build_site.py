@@ -30,6 +30,11 @@ class ContentFile:
     published_on: date | None = None
 
 
+class SortableContentFile(ContentFile):
+    def __lt__(self, other: object) -> bool:
+        return self.order < other.order
+
+
 def parse_frontmatter(raw_text: str) -> tuple[dict[str, object], str]:
     lines = raw_text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -120,7 +125,7 @@ def load_markdown(path: Path, route: str, slug: str | None = None) -> ContentFil
     description = str(frontmatter.get("description", ""))
     order_value = frontmatter.get("order")
     published_on = frontmatter.get("date")
-    return ContentFile(
+    return SortableContentFile(
         title=title,
         description=description,
         body_html=strip_leading_h1(render_markdown(body)),
