@@ -28,6 +28,7 @@ class ContentFile:
     slug: str | None = None
     summary: str | None = None
     published_on: date | None = None
+    reading_time_minutes: int | None = None
 
 
 def parse_frontmatter(raw_text: str) -> tuple[dict[str, object], str]:
@@ -114,22 +115,29 @@ def strip_leading_h1(body_html: str) -> str:
     return re.sub(r"^<h1>.*?</h1>\n?", "", body_html, count=1, flags=re.DOTALL)
 
 
+def estimate_reading_time(body_html: str) -> int:
+    word_count = len(body_html.split())
+    return max(1, (word_count + 199) // 200)
+
+
 def load_markdown(path: Path, route: str, slug: str | None = None) -> ContentFile:
     frontmatter, body = parse_frontmatter(path.read_text(encoding="utf-8"))
     title = str(frontmatter.get("title", slug or path.stem.replace("-", " ").title()))
     description = str(frontmatter.get("description", ""))
     order_value = frontmatter.get("order")
     published_on = frontmatter.get("date")
+    body_html = strip_leading_h1(render_markdown(body))
     return ContentFile(
         title=title,
         description=description,
-        body_html=strip_leading_h1(render_markdown(body)),
+        body_html=body_html,
         source_path=path,
         route=route,
         order=order_value if isinstance(order_value, int) else None,
         slug=slug,
         summary=str(frontmatter.get("summary")) if frontmatter.get("summary") is not None else None,
         published_on=published_on if isinstance(published_on, date) else None,
+        reading_time_minutes=estimate_reading_time(body_html),
     )
 
 
@@ -235,11 +243,14 @@ def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
 
 
 def render_article(section: ContentFile, article: ContentFile) -> str:
+    reading_time = ""
+    if article.reading_time_minutes is not None:
+        reading_time = f"<span>{article.reading_time_minutes} min read</span>"
     return f"""
 <article class="panel stack-gap">
   <a class="back-link" href="{section.route}">Back to {html.escape(section.title)}</a>
   <header class="panel-header stack-gap">
-    <div class="article-card-meta"><span>{html.escape(format_date(article.published_on))}</span></div>
+    <div class="article-card-meta"><span>{html.escape(format_date(article.published_on))}</span>{reading_time}</div>
     <div>
       <h1>{html.escape(article.title)}</h1>
       <p>{html.escape(article.description)}</p>
