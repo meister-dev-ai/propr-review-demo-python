@@ -27,6 +27,7 @@ class ContentFile:
     order: int | None = None
     slug: str | None = None
     summary: str | None = None
+    author: str | None = None
     published_on: date | None = None
 
 
@@ -129,6 +130,7 @@ def load_markdown(path: Path, route: str, slug: str | None = None) -> ContentFil
         order=order_value if isinstance(order_value, int) else None,
         slug=slug,
         summary=str(frontmatter.get("summary")) if frontmatter.get("summary") is not None else None,
+        author=str(frontmatter.get("author")) if frontmatter.get("author") is not None else None,
         published_on=published_on if isinstance(published_on, date) else None,
     )
 
@@ -243,6 +245,7 @@ def render_article(section: ContentFile, article: ContentFile) -> str:
     <div>
       <h1>{html.escape(article.title)}</h1>
       <p>{html.escape(article.description)}</p>
+      <p>By {html.escape(article.author.upper())}</p>
     </div>
   </header>
   <div class="markdown stack-gap">{article.body_html}</div>
