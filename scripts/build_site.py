@@ -159,6 +159,12 @@ def format_date(value: date | None) -> str:
     return value.strftime("%B %-d, %Y")
 
 
+def truncate_text(value: str, limit: int = 140) -> str:
+    if len(value) <= limit:
+        return value
+    return value[: limit - 1].rstrip() + value[-1]
+
+
 def nav_link_class(current_route: str, item_route: str) -> str:
     classes = ["nav-link"]
     if current_route == item_route:
@@ -217,7 +223,7 @@ def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
         <article class="article-card">
           <div class="article-card-meta"><span>{html.escape(format_date(article.published_on))}</span></div>
           <h2><a href="{article.route}">{html.escape(article.title)}</a></h2>
-          <p>{html.escape(article.summary or article.description)}</p>
+          <p>{html.escape(truncate_text(article.summary or article.description))}</p>
         </article>
         """
         for article in articles
