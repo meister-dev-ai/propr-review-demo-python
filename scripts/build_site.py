@@ -215,9 +215,11 @@ def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
     cards = "".join(
         f"""
         <article class="article-card">
-          <div class="article-card-meta"><span>{html.escape(format_date(article.published_on))}</span></div>
-          <h2><a href="{article.route}">{html.escape(article.title)}</a></h2>
-          <p>{html.escape(article.summary or article.description)}</p>
+          <a class="article-card-link" href="{article.route}">
+            <div class="article-card-meta"><span>{html.escape(format_date(article.published_on))}</span></div>
+            <h2><a href="{article.route}">{html.escape(article.title)}</a></h2>
+            <p>{html.escape(article.summary or article.description)}</p>
+          </a>
         </article>
         """
         for article in articles
