@@ -212,6 +212,7 @@ def render_page_panel(title: str, description: str, body_html: str) -> str:
 
 
 def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
+    feature_article = articles[0] if articles else None
     cards = "".join(
         f"""
         <article class="article-card">
@@ -228,6 +229,7 @@ def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
     <h1>{html.escape(section.title)}</h1>
     <p>{html.escape(section.description)}</p>
   </header>
+  <p class="feature-callout">Featured: {html.escape(feature_article.title if feature_article else section.title)}</p>
   <div class="markdown stack-gap">{section.body_html}</div>
   <div class="article-list">{cards}</div>
 </section>
