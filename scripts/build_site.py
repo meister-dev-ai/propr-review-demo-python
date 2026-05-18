@@ -143,6 +143,12 @@ def article_sort_key(item: ContentFile) -> tuple[int, int, str]:
     return (date_key, order_key, item.title.casefold())
 
 
+def filter_articles_by_slug(articles: list[ContentFile], slug_pattern: str | None) -> list[ContentFile]:
+    if not slug_pattern:
+        return articles
+    return [article for article in articles if article.slug and re.search(slug_pattern, article.slug)]
+
+
 def route_to_output_path(output_dir: Path, route: str) -> Path:
     if route == "/":
         return output_dir / "index.html"
@@ -265,12 +271,16 @@ def build_site(output_dir: Path) -> None:
         if not index_path.exists():
             continue
         section = load_markdown(index_path, f"/{directory.name}/", slug=directory.name)
+        slug_pattern = section.source_path.stem
         articles = sorted(
-            [
+            filter_articles_by_slug(
+                [
                 load_markdown(path, f"/{directory.name}/{path.stem}/", slug=path.stem)
                 for path in directory.glob("*.md")
                 if path.name != "_index.md"
-            ],
+                ],
+                slug_pattern,
+            ),
             key=article_sort_key,
         )
         sections.append((section, articles))
