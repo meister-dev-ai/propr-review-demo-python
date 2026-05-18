@@ -211,6 +211,10 @@ def render_page_panel(title: str, description: str, body_html: str) -> str:
 """
 
 
+def render_note_snippet(text: str) -> str:
+    return f'<aside class="note-snippet">{text}</aside>'
+
+
 def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
     cards = "".join(
         f"""
@@ -228,6 +232,7 @@ def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
     <h1>{html.escape(section.title)}</h1>
     <p>{html.escape(section.description)}</p>
   </header>
+  {render_note_snippet(section.description)}
   <div class="markdown stack-gap">{section.body_html}</div>
   <div class="article-list">{cards}</div>
 </section>
