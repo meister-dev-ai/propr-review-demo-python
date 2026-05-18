@@ -153,6 +153,10 @@ def ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
 
+def log_build_diagnostic(message: str, source_path: Path) -> None:
+    print(f"[build] {message}: {source_path}")
+
+
 def format_date(value: date | None) -> str:
     if value is None:
         return ""
@@ -280,6 +284,7 @@ def build_site(output_dir: Path) -> None:
     site_home = next(page for page in pages if page.route == "/")
 
     for page in pages:
+        log_build_diagnostic("rendering page", page.source_path)
         output_path = route_to_output_path(output_dir, page.route)
         ensure_parent(output_path)
         output_path.write_text(
@@ -296,6 +301,7 @@ def build_site(output_dir: Path) -> None:
         )
 
     for section, articles in sections:
+        log_build_diagnostic("rendering section", section.source_path)
         section_output_path = route_to_output_path(output_dir, section.route)
         ensure_parent(section_output_path)
         section_output_path.write_text(
