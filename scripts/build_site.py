@@ -21,6 +21,7 @@ STATIC_DIR = ROOT / "static"
 class ContentFile:
     title: str
     description: str
+    title_html: str
     body_html: str
     source_path: Path
     route: str
@@ -123,6 +124,7 @@ def load_markdown(path: Path, route: str, slug: str | None = None) -> ContentFil
     return ContentFile(
         title=title,
         description=description,
+        title_html=render_inline_markdown(title),
         body_html=strip_leading_h1(render_markdown(body)),
         source_path=path,
         route=route,
@@ -216,7 +218,7 @@ def render_blog_index(section: ContentFile, articles: list[ContentFile]) -> str:
         f"""
         <article class="article-card">
           <div class="article-card-meta"><span>{html.escape(format_date(article.published_on))}</span></div>
-          <h2><a href="{article.route}">{html.escape(article.title)}</a></h2>
+          <h2><a href="{article.route}">{article.title_html}</a></h2>
           <p>{html.escape(article.summary or article.description)}</p>
         </article>
         """
