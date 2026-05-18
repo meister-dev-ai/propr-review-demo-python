@@ -114,8 +114,16 @@ def strip_leading_h1(body_html: str) -> str:
     return re.sub(r"^<h1>.*?</h1>\n?", "", body_html, count=1, flags=re.DOTALL)
 
 
+def load_include_snippet(path: Path) -> str:
+    handle = path.open(encoding="utf-8")
+    return handle.read().strip()
+
+
 def load_markdown(path: Path, route: str, slug: str | None = None) -> ContentFile:
     frontmatter, body = parse_frontmatter(path.read_text(encoding="utf-8"))
+    include_path = path.with_suffix(".snippet")
+    if include_path.exists():
+        body = f"{body}\n\n{load_include_snippet(include_path)}"
     title = str(frontmatter.get("title", slug or path.stem.replace("-", " ").title()))
     description = str(frontmatter.get("description", ""))
     order_value = frontmatter.get("order")
