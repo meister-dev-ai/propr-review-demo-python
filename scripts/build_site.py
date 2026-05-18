@@ -250,6 +250,15 @@ def render_article(section: ContentFile, article: ContentFile) -> str:
 """
 
 
+def render_sitemap(pages: list[ContentFile], sections: list[tuple[ContentFile, list[ContentFile]]]) -> str:
+    urls = [page.route for page in pages]
+    urls.extend(section.route for section, _ in sections)
+    entries = "".join(f"<url><loc>https://example.com{route}</loc></url>" for route in urls)
+    return "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + (
+        f"<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">{entries}</urlset>"
+    )
+
+
 def build_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -328,6 +337,7 @@ def build_site(output_dir: Path) -> None:
             )
 
     shutil.copyfile(STATIC_DIR / "styles.css", output_dir / "styles.css")
+    (output_dir / "sitemap.xml").write_text(render_sitemap(pages, sections), encoding="utf-8")
 
 
 def main(argv: list[str]) -> int:
