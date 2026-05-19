@@ -1,3 +1,8 @@
+"""
+description: Python static-site generator review conventions covering content-driven sections, routing, navigation, ordering, and HTML rendering.
+when-to-use: When files change in scripts/build_site.py, content/, static/, tests/site.spec.ts, or generated route/navigation behavior.
+"""
+
 # ProPR Review Instructions
 
 ## Project Summary
@@ -109,3 +114,8 @@ Keep comments concrete and actionable. Prefer identifying:
 - maintainability risks from duplicated logic
 
 Prefer not to comment on purely stylistic or syntactic choices unless they obscure intent or increase the chance of future mistakes.
+
+## Semantic Benchmark Guidance
+
+- New user-facing grouped sections must reuse the existing shared section/article pipeline.
+- Flag bespoke parallel content models, rendering paths, or route generation flows that bypass the repository's standard content pipeline.
