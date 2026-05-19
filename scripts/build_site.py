@@ -250,6 +250,22 @@ def render_article(section: ContentFile, article: ContentFile) -> str:
 """
 
 
+def build_status_page() -> ContentFile:
+    return ContentFile(
+        title="Status",
+        description="Current availability for the review demo services.",
+        body_html="<p>All systems are operating normally.</p><ul><li>Site builds: healthy</li><li>Content publishing: healthy</li><li>Preview checks: healthy</li></ul>",
+        source_path=ROOT / "scripts" / "build_site.py",
+        route="/status/",
+        order=25,
+        slug="status",
+    )
+
+
+def discover_status_page() -> ContentFile | None:
+    return build_status_page()
+
+
 def build_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -276,7 +292,11 @@ def build_site(output_dir: Path) -> None:
         sections.append((section, articles))
 
     sorted_sections = sorted((section for section, _ in sections), key=page_sort_key)
-    nav_items = sorted([*pages, *sorted_sections], key=page_sort_key)
+    status_page = discover_status_page()
+    nav_items = sorted(
+        [*pages, *sorted_sections, *([status_page] if status_page is not None else [])],
+        key=page_sort_key,
+    )
     site_home = next(page for page in pages if page.route == "/")
 
     for page in pages:
@@ -291,6 +311,22 @@ def build_site(output_dir: Path) -> None:
                 page_title=page.title,
                 description=page.description,
                 body=render_page_panel(page.title, page.description, page.body_html),
+            ),
+            encoding="utf-8",
+        )
+
+    if status_page is not None:
+        status_output_path = route_to_output_path(output_dir, status_page.route)
+        ensure_parent(status_output_path)
+        status_output_path.write_text(
+            render_layout(
+                site_title=site_home.title,
+                site_tagline=site_home.description,
+                nav_items=nav_items,
+                current_route=status_page.route,
+                page_title=status_page.title,
+                description=status_page.description,
+                body=render_page_panel(status_page.title, status_page.description, status_page.body_html),
             ),
             encoding="utf-8",
         )
