@@ -250,6 +250,37 @@ def render_article(section: ContentFile, article: ContentFile) -> str:
 """
 
 
+def built_in_handbook_pages() -> tuple[ContentFile, list[ContentFile]]:
+    section = ContentFile(
+        title="Handbook",
+        description="Operating notes for the team.",
+        body_html="<p>Reference pages for shipping and maintaining the demo site.</p>",
+        source_path=ROOT / "scripts" / "build_site.py",
+        route="/handbook/",
+        order=30,
+        slug="handbook",
+    )
+    pages = [
+        ContentFile(
+            title="Publishing checklist",
+            description="A lightweight release checklist.",
+            body_html="<ul><li>Run the build.</li><li>Check navigation.</li><li>Publish the generated output.</li></ul>",
+            source_path=ROOT / "scripts" / "build_site.py",
+            route="/handbook/publishing-checklist/",
+            slug="publishing-checklist",
+        ),
+        ContentFile(
+            title="Editorial workflow",
+            description="How updates move from draft to publish.",
+            body_html="<p>Draft changes in a branch, review the generated pages, and then merge to main.</p>",
+            source_path=ROOT / "scripts" / "build_site.py",
+            route="/handbook/editorial-workflow/",
+            slug="editorial-workflow",
+        ),
+    ]
+    return section, pages
+
+
 def build_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -274,6 +305,8 @@ def build_site(output_dir: Path) -> None:
             key=article_sort_key,
         )
         sections.append((section, articles))
+
+    sections.append(built_in_handbook_pages())
 
     sorted_sections = sorted((section for section, _ in sections), key=page_sort_key)
     nav_items = sorted([*pages, *sorted_sections], key=page_sort_key)
