@@ -30,6 +30,13 @@ class ContentFile:
     published_on: date | None = None
 
 
+@dataclass
+class ShowcaseEntry:
+    title: str
+    summary: str
+    route: str
+
+
 def parse_frontmatter(raw_text: str) -> tuple[dict[str, object], str]:
     lines = raw_text.splitlines()
     if not lines or lines[0].strip() != "---":
@@ -250,6 +257,55 @@ def render_article(section: ContentFile, article: ContentFile) -> str:
 """
 
 
+def load_showcase_entries() -> list[ShowcaseEntry]:
+    return [
+        ShowcaseEntry(
+            title="Team dashboard refresh",
+            summary="A compact redesign focused on reviewer signal and release health.",
+            route="/showcase/team-dashboard-refresh/",
+        ),
+        ShowcaseEntry(
+            title="Docs onboarding sprint",
+            summary="A documentation push that reduced first-week setup questions.",
+            route="/showcase/docs-onboarding-sprint/",
+        ),
+    ]
+
+
+def render_showcase_index(entries: list[ShowcaseEntry]) -> str:
+    cards = "".join(
+        f"""
+        <article class="article-card">
+          <h2><a href="{entry.route}">{html.escape(entry.title)}</a></h2>
+          <p>{html.escape(entry.summary)}</p>
+        </article>
+        """
+        for entry in entries
+    )
+    return f"""
+<section class="panel stack-gap">
+  <header class="panel-header">
+    <h1>Showcase</h1>
+    <p>Selected work from recent product and documentation efforts.</p>
+  </header>
+  <div class="article-list">{cards}</div>
+</section>
+"""
+
+
+def render_showcase_entry(entry: ShowcaseEntry) -> str:
+    return f"""
+<article class="panel stack-gap">
+  <a class="back-link" href="/showcase/">Back to Showcase</a>
+  <header class="panel-header">
+    <h1>{html.escape(entry.title)}</h1>
+    <p>{html.escape(entry.summary)}</p>
+  </header>
+  <div class="markdown stack-gap"><p>This entry is maintained separately from editorial content.</p></div>
+</article>
+"""
+
+
 def build_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -276,7 +332,17 @@ def build_site(output_dir: Path) -> None:
         sections.append((section, articles))
 
     sorted_sections = sorted((section for section, _ in sections), key=page_sort_key)
-    nav_items = sorted([*pages, *sorted_sections], key=page_sort_key)
+    showcase_entries = load_showcase_entries()
+    showcase_page = ContentFile(
+        title="Showcase",
+        description="Selected work from recent product and documentation efforts.",
+        body_html="",
+        source_path=ROOT / "scripts" / "build_site.py",
+        route="/showcase/",
+        order=35,
+        slug="showcase",
+    )
+    nav_items = sorted([*pages, *sorted_sections, showcase_page], key=page_sort_key)
     site_home = next(page for page in pages if page.route == "/")
 
     for page in pages:
@@ -326,6 +392,37 @@ def build_site(output_dir: Path) -> None:
                 ),
                 encoding="utf-8",
             )
+
+    showcase_output_path = route_to_output_path(output_dir, showcase_page.route)
+    ensure_parent(showcase_output_path)
+    showcase_output_path.write_text(
+        render_layout(
+            site_title=site_home.title,
+            site_tagline=site_home.description,
+            nav_items=nav_items,
+            current_route=showcase_page.route,
+            page_title=showcase_page.title,
+            description=showcase_page.description,
+            body=render_showcase_index(showcase_entries),
+        ),
+        encoding="utf-8",
+    )
+
+    for entry in showcase_entries:
+        entry_output_path = route_to_output_path(output_dir, entry.route)
+        ensure_parent(entry_output_path)
+        entry_output_path.write_text(
+            render_layout(
+                site_title=site_home.title,
+                site_tagline=site_home.description,
+                nav_items=nav_items,
+                current_route=showcase_page.route,
+                page_title=entry.title,
+                description=entry.summary,
+                body=render_showcase_entry(entry),
+            ),
+            encoding="utf-8",
+        )
 
     shutil.copyfile(STATIC_DIR / "styles.css", output_dir / "styles.css")
 
