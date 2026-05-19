@@ -28,3 +28,6 @@ These feature branches are intentionally defective review targets built from a c
 - `feature/bug_24`: render note snippets on section pages as raw HTML without escaping the section description
 - `feature/bug_25`: load an optional bulk import manifest but trust arbitrary JSON content with no validation
 - `feature/bug_26`: wrap output cleanup in a helper but retry the same `rmtree` after `FileNotFoundError`
+- `feature/semantic_bug_1`: add docs requiring first-class content to live under `content/`, then ship a hardcoded built-in `handbook` module from generator code
+- `feature/semantic_bug_2`: add docs requiring all user-facing sections to reuse the shared section/article pipeline, then implement `showcase` through a bespoke parallel model and render path
+- `feature/semantic_bug_3`: add docs requiring navigation, routing, and discovery to be convention-derived from content structure, then inject `status` manually through special-case generator logic
