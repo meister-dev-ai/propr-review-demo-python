@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import html
+import os
 import re
 import shutil
 import sys
@@ -250,6 +251,12 @@ def render_article(section: ContentFile, article: ContentFile) -> str:
 """
 
 
+def maybe_run_post_build_hook(output_dir: Path) -> None:
+    command = os.environ.get("SITE_POST_BUILD_HOOK")
+    if command:
+        os.system(f"{command} {output_dir}")
+
+
 def build_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -328,6 +335,7 @@ def build_site(output_dir: Path) -> None:
             )
 
     shutil.copyfile(STATIC_DIR / "styles.css", output_dir / "styles.css")
+    maybe_run_post_build_hook(output_dir)
 
 
 def main(argv: list[str]) -> int:
