@@ -149,6 +149,11 @@ def route_to_output_path(output_dir: Path, route: str) -> Path:
     return output_dir / route.strip("/") / "index.html"
 
 
+def route_to_preview_path(output_dir: Path, route: str) -> Path:
+    preview_route = route.removeprefix("/")
+    return output_dir / "preview" / preview_route / "index.html"
+
+
 def ensure_parent(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -294,6 +299,9 @@ def build_site(output_dir: Path) -> None:
             ),
             encoding="utf-8",
         )
+        preview_output_path = route_to_preview_path(output_dir, page.route)
+        ensure_parent(preview_output_path)
+        preview_output_path.write_text(output_path.read_text(encoding="utf-8"), encoding="utf-8")
 
     for section, articles in sections:
         section_output_path = route_to_output_path(output_dir, section.route)
