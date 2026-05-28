@@ -250,6 +250,27 @@ def render_article(section: ContentFile, article: ContentFile) -> str:
 """
 
 
+def render_related_articles(section: ContentFile, article: ContentFile, articles: list[ContentFile]) -> str:
+    related_articles = [
+        candidate
+        for candidate in articles
+        if candidate.title != article.title and candidate.published_on != article.published_on
+    ][:2]
+    if not related_articles:
+        return ""
+
+    links = "".join(
+        f'<li><a href="{candidate.route}">{html.escape(candidate.title)}</a></li>'
+        for candidate in related_articles
+    )
+    return f"""
+<nav class="related-articles" aria-label="Related articles">
+  <h2>Related posts</h2>
+  <ul>{links}</ul>
+</nav>
+"""
+
+
 def build_site(output_dir: Path) -> None:
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -322,7 +343,7 @@ def build_site(output_dir: Path) -> None:
                     current_route=section.route,
                     page_title=article.title,
                     description=article.description,
-                    body=render_article(section, article),
+                    body=render_article(section, article) + render_related_articles(section, article, articles),
                 ),
                 encoding="utf-8",
             )

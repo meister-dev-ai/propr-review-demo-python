@@ -181,6 +181,29 @@ main {
   font-weight: 600;
 }
 
+.related-articles {
+  margin-top: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(18, 32, 51, 0.08);
+}
+
+.related-articles h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+
+.related-articles ul {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.related-articles a {
+  text-decoration: none;
+  font-weight: 600;
+}
+
 @media (max-width: 800px) {
   .site-header {
     flex-direction: column;
